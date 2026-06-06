@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fruit Rush</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b, #312e81);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 900px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 5px;
+      text-shadow: 0 0 20px #22c55e;
+    }
+
+    .subtitle {
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .box {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      padding: 12px 22px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    #game {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      border-radius: 30px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,0.25), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(59,130,246,0.25), transparent 35%),
+        rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.25);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    }
+
+    .item {
+      position: absolute;
+      font-size: 46px;
+      cursor: pointer;
+      user-select: none;
+      animation: pop 0.25s ease, float 1.4s infinite ease-in-out;
+      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.4));
+    }
+
+    .gold {
+      animation: pop 0.25s ease, spin 1s infinite linear;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-10px) scale(1.08); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg) scale(1.1); }
+      to { transform: rotate(360deg) scale(1.1); }
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 14px 35px;
+      font-size: 20px;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 12px 30px rgba(34,197,94,0.4);
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(34,197,94,0.6);
+    }
+
+    .message {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+      padding: 20px;
+    }
+
+    .message h2 {
+      font-size: 42px;
+      margin: 0;
+    }
+
+    .hidden { display: none; }
+
+    .effect {
+      position: absolute;
+      font-size: 24px;
+      pointer-events: none;
+      animation: rise 0.8s ease forwards;
+      z-index: 5;
+    }
+
+    @keyframes rise {
+      to {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 36px; }
+      #game { height: 430px; }
+      .box { font-size: 16px; padding: 10px 14px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🍓 Fruit Rush</h1>
+    <p class="subtitle">Click fruits, collect golden stars, and avoid bombs!</p>
+
+    <div class="stats">
+      <div class="box">Score: <span id="score">0</span></div>
+      <div class="box">Lives: <span id="lives">3</span></div>
+      <div class="box">Time: <span id="time">30</span>s</div>
+      <div class="box">Level: <span id="level">1</span></div>
+    </div>
+
+    <div id="game">
+      <div id="startScreen" class="message">
+        <h2>Ready?</h2>
+        <p>Click as many fruits as you can!</p>
+      </div>
+    </div>
+
+    <button onclick="startGame()">Start Game</button>
+  </div>
+
+  <script>
+    const game = document.getElementById("game");
+    const scoreEl = document.getElementById("score");
+    const livesEl = document.getElementById("lives");
+    const timeEl = document.getElementById("time");
+    const levelEl = document.getElementById("level");
+    const startScreen = document.getElementById("startScreen");
+
+    let score = 0;
+    let lives = 3;
+    let time = 30;
+    let level = 1;
+    let speed = 900;
+    let spawnInterval;
+    let timerInterval;
+    let playing = false;
+
+    const fruits = ["🍎", "🍌", "🍓", "🍇", "🍉", "🍍", "🥝"];
+
+    function playSound(type) {
+      const audio = new Audio();
+
+      if (type === "fruit") {
+        audio.src = "https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3";
+      }
+
+      if (type === "gold") {
+        audio.src = "https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3";
+      }
+
+      if (type === "bomb") {
+        audio.src = "https://assets.mixkit.co/active_storage/sfx/1685/1685-preview.mp3";
+      }
+
+      if (type === "gameover") {
+        audio.src = "https://assets.mixkit.co/active_storage/sfx/2658/2658-preview.mp3";
+      }
+
+      audio.volume = 0.35;
+      audio.play().catch(() => {});
+    }
+
+    function startGame() {
+      score = 0;
+      lives = 3;
+      time = 30;
+      level = 1;
+      speed = 900;
+      playing = true;
+
+      scoreEl.textContent = score;
+      livesEl.textContent = lives;
+      timeEl.textContent = time;
+      levelEl.textContent = level;
+
+      game.querySelectorAll(".item, .effect").forEach(el => el.remove());
+
+      startScreen.innerHTML = `
+        <h2>Ready?</h2>
+        <p>Click as many fruits as you can!</p>
+      `;
+      startScreen.classList.add("hidden");
+
+      clearInterval(spawnInterval);
+      clearInterval(timerInterval);
+
+      spawnInterval = setInterval(createItem, speed);
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function createItem() {
+      if (!playing) return;
+
+      const item = document.createElement("div");
+      item.classList.add("item");
+
+      const random = Math.random();
+      let type;
+
+      if (random < 0.18) {
+        type = "bomb";
+        item.textContent = "💣";
+      } else if (random < 0.28) {
+        type = "gold";
+        item.textContent = "⭐";
+        item.classList.add("gold");
+      } else {
+        type = "fruit";
+        item.textContent = fruits[Math.floor(Math.random() * fruits.length)];
+      }
+
+      const x = Math.random() * (game.clientWidth - 60);
+      const y = Math.random() * (game.clientHeight - 60);
+
+      item.style.left = x + "px";
+      item.style.top = y + "px";
+
+      item.onclick = () => {
+        if (!playing) return;
+
+        if (type === "bomb") {
+          playSound("bomb");
+          lives--;
+          livesEl.textContent = lives;
+          showEffect(x, y, "-1 Life", "#ef4444");
+          item.remove();
+
+          if (lives <= 0) {
+            endGame("Game Over!");
+          }
+        }
+
+        if (type === "fruit") {
+          playSound("fruit");
+          score++;
+          showEffect(x, y, "+1", "#22c55e");
+          item.remove();
+          updateScore();
+        }
+
+        if (type === "gold") {
+          playSound("gold");
+          score += 5;
+          time += 3;
+          showEffect(x, y, "+5 +3s", "#facc15");
+          item.remove();
+          updateScore();
+          timeEl.textContent = time;
+        }
+      };
+
+      game.appendChild(item);
+
+      setTimeout(() => {
+        if (item.parentElement) item.remove();
+      }, 1300);
+    }
+
+    function updateScore() {
+      scoreEl.textContent = score;
+
+      const newLevel = Math.floor(score / 10) + 1;
+
+      if (newLevel > level) {
+        level = newLevel;
+        levelEl.textContent = level;
+
+        speed = Math.max(300, speed - 100);
+        clearInterval(spawnInterval);
+        spawnInterval = setInterval(createItem, speed);
+      }
+    }
+
+    function updateTimer() {
+      if (!playing) return;
+
+      time--;
+      timeEl.textContent = time;
+
+      if (time <= 0) {
+        endGame("Time's Up!");
+      }
+    }
+
+    function showEffect(x, y, text, color) {
+      const effect = document.createElement("div");
+      effect.classList.add("effect");
+      effect.textContent = text;
+      effect.style.left = x + "px";
+      effect.style.top = y + "px";
+      effect.style.color = color;
+      effect.style.fontWeight = "bold";
+
+      game.appendChild(effect);
+
+      setTimeout(() => {
+        effect.remove();
+      }, 800);
+    }
+
+    function endGame(title) {
+      playSound("gameover");
+      playing = false;
+
+      clearInterval(spawnInterval);
+      clearInterval(timerInterval);
+
+      game.querySelectorAll(".item, .effect").forEach(el => el.remove());
+
+      startScreen.classList.remove("hidden");
+      startScreen.innerHTML = `
+        <h2>${title}</h2>
+        <p>Your final score: <strong>${score}</strong></p>
+        <p>Press Start Game to play again.</p>
+      `;
+    }
+  </script>
+</body>
+</html>
