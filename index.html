@@ -168,6 +168,7 @@
       <div class="box">Lives: <span id="lives">3</span></div>
       <div class="box">Time: <span id="time">30</span>s</div>
       <div class="box">Level: <span id="level">1</span></div>
+      <div class="box">Best: <span id="best">0</span></div>
     </div>
 
     <div id="game">
@@ -186,6 +187,7 @@
     const livesEl = document.getElementById("lives");
     const timeEl = document.getElementById("time");
     const levelEl = document.getElementById("level");
+    const bestEl = document.getElementById("best");
     const startScreen = document.getElementById("startScreen");
 
     let score = 0;
@@ -196,6 +198,8 @@
     let spawnInterval;
     let timerInterval;
     let playing = false;
+    let bestScore = localStorage.getItem("fruitRushBest") || 0;
+bestEl.textContent = bestScore;
 
     const fruits = ["🍎", "🍌", "🍓", "🍇", "🍉", "🍍", "🥝"];
 
@@ -363,6 +367,11 @@
     function endGame(title) {
       playSound("gameover");
       playing = false;
+      if (score > bestScore) {
+  bestScore = score;
+  localStorage.setItem("fruitRushBest", bestScore);
+  bestEl.textContent = bestScore;
+}
 
       clearInterval(spawnInterval);
       clearInterval(timerInterval);
