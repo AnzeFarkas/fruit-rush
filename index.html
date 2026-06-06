@@ -3,83 +3,104 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fruit Rush online</title>
+  <title>Fruit Rush</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       margin: 0;
       min-height: 100vh;
       font-family: "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b, #312e81);
+      background: linear-gradient(135deg, #020617, #0f172a, #312e81);
       color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      padding: 12px;
     }
 
     .container {
-      width: 95%;
-      max-width: 900px;
+      width: 100%;
+      max-width: 980px;
       text-align: center;
     }
 
     h1 {
-      font-size: 48px;
-      margin-bottom: 5px;
-      text-shadow: 0 0 20px #22c55e;
+      font-size: clamp(36px, 7vw, 64px);
+      margin: 8px 0 5px;
+      text-shadow: 0 0 25px #22c55e;
     }
 
     .subtitle {
       color: #cbd5e1;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .stats {
       display: flex;
       justify-content: center;
-      gap: 15px;
-      margin-bottom: 15px;
+      gap: 12px;
+      margin-bottom: 14px;
       flex-wrap: wrap;
     }
 
     .box {
       background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(10px);
-      padding: 12px 22px;
-      border-radius: 15px;
+      backdrop-filter: blur(12px);
+      padding: 10px 18px;
+      border-radius: 16px;
       border: 1px solid rgba(255,255,255,0.2);
-      font-size: 20px;
+      font-size: 18px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    #missionBox {
+      margin: 0 auto 15px;
+      max-width: 700px;
+      background: rgba(250, 204, 21, 0.14);
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      border-radius: 18px;
+      padding: 10px 18px;
+      color: #fde68a;
+      font-weight: 600;
     }
 
     #game {
       position: relative;
       width: 100%;
-      height: 500px;
+      height: 520px;
       border-radius: 30px;
       overflow: hidden;
       background:
-        radial-gradient(circle at top left, rgba(34,197,94,0.25), transparent 35%),
-        radial-gradient(circle at bottom right, rgba(59,130,246,0.25), transparent 35%),
+        radial-gradient(circle at top left, rgba(34,197,94,0.28), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(59,130,246,0.28), transparent 34%),
         rgba(255,255,255,0.08);
       border: 2px solid rgba(255,255,255,0.25);
       box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+      touch-action: manipulation;
     }
 
     .item {
       position: absolute;
-      font-size: 46px;
+      font-size: clamp(38px, 7vw, 54px);
       cursor: pointer;
       user-select: none;
       animation: pop 0.25s ease, float 1.4s infinite ease-in-out;
       filter: drop-shadow(0 8px 10px rgba(0,0,0,0.4));
+      z-index: 3;
     }
 
-    .gold {
+    .gold, .diamond {
       animation: pop 0.25s ease, spin 1s infinite linear;
+    }
+
+    .clock {
+      animation: pop 0.25s ease, pulse 0.8s infinite ease-in-out;
     }
 
     @keyframes pop {
@@ -97,22 +118,38 @@
       to { transform: rotate(360deg) scale(1.1); }
     }
 
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .buttons {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
     button {
-      margin-top: 20px;
-      padding: 14px 35px;
-      font-size: 20px;
+      padding: 13px 26px;
+      font-size: 17px;
       border: none;
       border-radius: 999px;
       cursor: pointer;
       color: white;
       background: linear-gradient(135deg, #22c55e, #16a34a);
-      box-shadow: 0 12px 30px rgba(34,197,94,0.4);
+      box-shadow: 0 12px 30px rgba(34,197,94,0.35);
       transition: 0.2s;
     }
 
     button:hover {
       transform: translateY(-3px);
-      box-shadow: 0 18px 40px rgba(34,197,94,0.6);
+    }
+
+    .secondary {
+      background: linear-gradient(135deg, #6366f1, #4338ca);
+      box-shadow: 0 12px 30px rgba(99,102,241,0.35);
     }
 
     .message {
@@ -122,38 +159,73 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(8px);
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(9px);
       z-index: 10;
       padding: 20px;
     }
 
     .message h2 {
-      font-size: 42px;
-      margin: 0;
+      font-size: clamp(34px, 7vw, 52px);
+      margin: 0 0 10px;
     }
 
-    .hidden { display: none; }
+    .hidden {
+      display: none;
+    }
 
     .effect {
       position: absolute;
       font-size: 24px;
       pointer-events: none;
       animation: rise 0.8s ease forwards;
-      z-index: 5;
+      z-index: 6;
+      font-weight: bold;
     }
 
     @keyframes rise {
       to {
-        transform: translateY(-50px);
+        transform: translateY(-55px);
         opacity: 0;
       }
     }
 
-    @media (max-width: 600px) {
-      h1 { font-size: 36px; }
-      #game { height: 430px; }
-      .box { font-size: 16px; padding: 10px 14px; }
+    .combo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 28px;
+      color: #facc15;
+      font-weight: 900;
+      text-shadow: 0 0 18px #facc15;
+      z-index: 7;
+      animation: pop 0.25s ease;
+    }
+
+    @media (max-width: 650px) {
+      body {
+        align-items: flex-start;
+        overflow-y: auto;
+      }
+
+      #game {
+        height: 430px;
+        border-radius: 22px;
+      }
+
+      .box {
+        font-size: 15px;
+        padding: 9px 12px;
+      }
+
+      button {
+        font-size: 15px;
+        padding: 12px 18px;
+      }
+
+      .subtitle {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -161,49 +233,82 @@
 <body>
   <div class="container">
     <h1>🍓 Fruit Rush</h1>
-    <p class="subtitle">Click fruits, collect golden stars, and avoid bombs!</p>
+    <p class="subtitle">Click fruits, collect power-ups, complete missions, and avoid bombs!</p>
 
     <div class="stats">
       <div class="box">Score: <span id="score">0</span></div>
-      <div class="box">Lives: <span id="lives">3</span></div>
+      <div class="box">Best: <span id="best">0</span></div>
+      <div class="box">Lives: <span id="lives">❤️❤️❤️</span></div>
       <div class="box">Time: <span id="time">30</span>s</div>
       <div class="box">Level: <span id="level">1</span></div>
-      <div class="box">Best: <span id="best">0</span></div>
     </div>
+
+    <div id="missionBox">Mission: Collect 20 fruits</div>
 
     <div id="game">
       <div id="startScreen" class="message">
         <h2>Ready?</h2>
-        <p>Click as many fruits as you can!</p>
+        <p>Complete missions and beat your high score!</p>
       </div>
     </div>
 
-    <button onclick="startGame()">Start Game</button>
+    <div class="buttons">
+      <button onclick="startGame()">Start Game</button>
+      <button class="secondary" id="soundBtn" onclick="toggleSound()">🔊 Sound: ON</button>
+      <button class="secondary" id="musicBtn" onclick="toggleMusic()">🎵 Music: OFF</button>
+      <button class="secondary" onclick="copyScore()">🌍 Copy Score</button>
+    </div>
   </div>
 
   <script>
     const game = document.getElementById("game");
     const scoreEl = document.getElementById("score");
+    const bestEl = document.getElementById("best");
     const livesEl = document.getElementById("lives");
     const timeEl = document.getElementById("time");
     const levelEl = document.getElementById("level");
-    const bestEl = document.getElementById("best");
     const startScreen = document.getElementById("startScreen");
+    const missionBox = document.getElementById("missionBox");
+    const soundBtn = document.getElementById("soundBtn");
+    const musicBtn = document.getElementById("musicBtn");
 
     let score = 0;
+    let bestScore = Number(localStorage.getItem("fruitRushBest")) || 0;
     let lives = 3;
     let time = 30;
     let level = 1;
-    let speed = 900;
+    let speed = 850;
     let spawnInterval;
     let timerInterval;
     let playing = false;
-    let bestScore = localStorage.getItem("fruitRushBest") || 0;
-bestEl.textContent = bestScore;
 
-    const fruits = ["🍎", "🍌", "🍓", "🍇", "🍉", "🍍", "🥝"];
+    let soundEnabled = localStorage.getItem("fruitRushSound") !== "off";
+    let musicEnabled = false;
+    let fruitClicks = 0;
+    let comboCount = 0;
+    let lastClickTime = 0;
+    let missionCompleted = false;
+
+    const fruits = ["🍎", "🍌", "🍓", "🍇", "🍉", "🍍", "🥝", "🍒", "🥭"];
+
+    const missions = [
+      { text: "Collect 20 fruits", target: 20 },
+      { text: "Collect 35 fruits", target: 35 },
+      { text: "Collect 50 fruits", target: 50 }
+    ];
+
+    let currentMission = missions[0];
+
+    bestEl.textContent = bestScore;
+    updateSoundButton();
+
+    const backgroundMusic = new Audio("https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3");
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.18;
 
     function playSound(type) {
+      if (!soundEnabled) return;
+
       const audio = new Audio();
 
       if (type === "fruit") {
@@ -218,8 +323,16 @@ bestEl.textContent = bestScore;
         audio.src = "https://assets.mixkit.co/active_storage/sfx/1685/1685-preview.mp3";
       }
 
+      if (type === "diamond") {
+        audio.src = "https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3";
+      }
+
       if (type === "gameover") {
         audio.src = "https://assets.mixkit.co/active_storage/sfx/2658/2658-preview.mp3";
+      }
+
+      if (type === "mission") {
+        audio.src = "https://assets.mixkit.co/active_storage/sfx/1439/1439-preview.mp3";
       }
 
       audio.volume = 0.35;
@@ -231,19 +344,25 @@ bestEl.textContent = bestScore;
       lives = 3;
       time = 30;
       level = 1;
-      speed = 900;
+      speed = 850;
+      fruitClicks = 0;
+      comboCount = 0;
+      lastClickTime = 0;
+      missionCompleted = false;
+      currentMission = missions[Math.floor(Math.random() * missions.length)];
       playing = true;
 
       scoreEl.textContent = score;
-      livesEl.textContent = lives;
       timeEl.textContent = time;
       levelEl.textContent = level;
+      updateLives();
+      updateMission();
 
-      game.querySelectorAll(".item, .effect").forEach(el => el.remove());
+      game.querySelectorAll(".item, .effect, .combo").forEach(el => el.remove());
 
       startScreen.innerHTML = `
         <h2>Ready?</h2>
-        <p>Click as many fruits as you can!</p>
+        <p>Complete missions and beat your high score!</p>
       `;
       startScreen.classList.add("hidden");
 
@@ -252,6 +371,11 @@ bestEl.textContent = bestScore;
 
       spawnInterval = setInterval(createItem, speed);
       timerInterval = setInterval(updateTimer, 1000);
+
+      if (musicEnabled) {
+        backgroundMusic.currentTime = 0;
+        backgroundMusic.play().catch(() => {});
+      }
     }
 
     function createItem() {
@@ -263,77 +387,148 @@ bestEl.textContent = bestScore;
       const random = Math.random();
       let type;
 
-      if (random < 0.18) {
+      if (random < 0.16) {
         type = "bomb";
         item.textContent = "💣";
-      } else if (random < 0.28) {
+      } else if (random < 0.24) {
         type = "gold";
         item.textContent = "⭐";
         item.classList.add("gold");
+      } else if (random < 0.29) {
+        type = "diamond";
+        item.textContent = "💎";
+        item.classList.add("diamond");
+      } else if (random < 0.34) {
+        type = "clock";
+        item.textContent = "⏰";
+        item.classList.add("clock");
+      } else if (random < 0.38) {
+        type = "heart";
+        item.textContent = "❤️";
       } else {
         type = "fruit";
         item.textContent = fruits[Math.floor(Math.random() * fruits.length)];
       }
 
-      const x = Math.random() * (game.clientWidth - 60);
-      const y = Math.random() * (game.clientHeight - 60);
+      const x = Math.random() * (game.clientWidth - 65);
+      const y = Math.random() * (game.clientHeight - 65);
 
       item.style.left = x + "px";
       item.style.top = y + "px";
 
-      item.onclick = () => {
-        if (!playing) return;
-
-        if (type === "bomb") {
-          playSound("bomb");
-          lives--;
-          livesEl.textContent = lives;
-          showEffect(x, y, "-1 Life", "#ef4444");
-          item.remove();
-
-          if (lives <= 0) {
-            endGame("Game Over!");
-          }
-        }
-
-        if (type === "fruit") {
-          playSound("fruit");
-          score++;
-          showEffect(x, y, "+1", "#22c55e");
-          item.remove();
-          updateScore();
-        }
-
-        if (type === "gold") {
-          playSound("gold");
-          score += 5;
-          time += 3;
-          showEffect(x, y, "+5 +3s", "#facc15");
-          item.remove();
-          updateScore();
-          timeEl.textContent = time;
-        }
-      };
+      item.onclick = () => handleClick(type, item, x, y);
 
       game.appendChild(item);
 
       setTimeout(() => {
         if (item.parentElement) item.remove();
-      }, 1300);
+      }, 1250);
+    }
+
+    function handleClick(type, item, x, y) {
+      if (!playing) return;
+
+      const now = Date.now();
+
+      if (type === "bomb") {
+        playSound("bomb");
+        lives--;
+        comboCount = 0;
+        updateLives();
+        showEffect(x, y, "-1 Life", "#ef4444");
+        item.remove();
+
+        if (lives <= 0) {
+          endGame("Game Over!");
+        }
+
+        return;
+      }
+
+      if (now - lastClickTime < 800) {
+        comboCount++;
+      } else {
+        comboCount = 1;
+      }
+
+      lastClickTime = now;
+
+      if (comboCount >= 3) {
+        score += 2;
+        showCombo("COMBO +2");
+        comboCount = 0;
+      }
+
+      if (type === "fruit") {
+        playSound("fruit");
+        score++;
+        fruitClicks++;
+        showEffect(x, y, "+1", "#22c55e");
+      }
+
+      if (type === "gold") {
+        playSound("gold");
+        score += 5;
+        time += 3;
+        showEffect(x, y, "+5 +3s", "#facc15");
+      }
+
+      if (type === "diamond") {
+        playSound("diamond");
+        score += 10;
+        showEffect(x, y, "+10", "#67e8f9");
+      }
+
+      if (type === "clock") {
+        playSound("gold");
+        time += 6;
+        showEffect(x, y, "+6s", "#38bdf8");
+      }
+
+      if (type === "heart") {
+        playSound("gold");
+        lives = Math.min(5, lives + 1);
+        updateLives();
+        showEffect(x, y, "+1 Heart", "#fb7185");
+      }
+
+      item.remove();
+      updateScore();
+      updateMission();
+      timeEl.textContent = time;
     }
 
     function updateScore() {
       scoreEl.textContent = score;
 
-      const newLevel = Math.floor(score / 10) + 1;
+      const newLevel = Math.floor(score / 18) + 1;
 
       if (newLevel > level) {
         level = newLevel;
         levelEl.textContent = level;
 
-        speed = Math.max(300, speed - 100);
+        speed = Math.max(280, speed - 80);
         clearInterval(spawnInterval);
         spawnInterval = setInterval(createItem, speed);
+      }
+    }
+
+    function updateLives() {
+      livesEl.textContent = "❤️".repeat(lives);
+    }
+
+    function updateMission() {
+      if (!missionCompleted) {
+        missionBox.textContent = `Mission: ${currentMission.text} (${fruitClicks}/${currentMission.target})`;
+
+        if (fruitClicks >= currentMission.target) {
+          missionCompleted = true;
+          score += 15;
+          playSound("mission");
+          showCenterEffect("MISSION COMPLETE +15");
+          missionBox.textContent = "Mission completed! Bonus +15 points!";
+          updateScore();
+        }
       }
     }
 
@@ -355,35 +550,88 @@ bestEl.textContent = bestScore;
       effect.style.left = x + "px";
       effect.style.top = y + "px";
       effect.style.color = color;
-      effect.style.fontWeight = "bold";
-
       game.appendChild(effect);
 
-      setTimeout(() => {
-        effect.remove();
-      }, 800);
+      setTimeout(() => effect.remove(), 800);
+    }
+
+    function showCombo(text) {
+      const combo = document.createElement("div");
+      combo.classList.add("combo");
+      combo.textContent = text;
+      game.appendChild(combo);
+
+      setTimeout(() => combo.remove(), 700);
+    }
+
+    function showCenterEffect(text) {
+      const effect = document.createElement("div");
+      effect.classList.add("combo");
+      effect.textContent = text;
+      effect.style.left = "50%";
+      effect.style.right = "auto";
+      effect.style.top = "45%";
+      effect.style.transform = "translateX(-50%)";
+      game.appendChild(effect);
+
+      setTimeout(() => effect.remove(), 1500);
     }
 
     function endGame(title) {
       playSound("gameover");
       playing = false;
-      if (score > bestScore) {
-  bestScore = score;
-  localStorage.setItem("fruitRushBest", bestScore);
-  bestEl.textContent = bestScore;
-}
 
       clearInterval(spawnInterval);
       clearInterval(timerInterval);
 
-      game.querySelectorAll(".item, .effect").forEach(el => el.remove());
+      if (score > bestScore) {
+        bestScore = score;
+        localStorage.setItem("fruitRushBest", bestScore);
+        bestEl.textContent = bestScore;
+      }
+
+      backgroundMusic.pause();
+
+      game.querySelectorAll(".item, .effect, .combo").forEach(el => el.remove());
 
       startScreen.classList.remove("hidden");
       startScreen.innerHTML = `
         <h2>${title}</h2>
         <p>Your final score: <strong>${score}</strong></p>
+        <p>Best score: <strong>${bestScore}</strong></p>
+        <p>${missionCompleted ? "Mission completed ✅" : "Mission failed ❌"}</p>
         <p>Press Start Game to play again.</p>
       `;
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem("fruitRushSound", soundEnabled ? "on" : "off");
+      updateSoundButton();
+    }
+
+    function updateSoundButton() {
+      soundBtn.textContent = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+    }
+
+    function toggleMusic() {
+      musicEnabled = !musicEnabled;
+
+      if (musicEnabled) {
+        backgroundMusic.play().catch(() => {});
+        musicBtn.textContent = "🎵 Music: ON";
+      } else {
+        backgroundMusic.pause();
+        musicBtn.textContent = "🎵 Music: OFF";
+      }
+    }
+
+    function copyScore() {
+      const text = `I scored ${score} points in Fruit Rush! Best score: ${bestScore}. Can you beat me? 🍓🎮`;
+
+      navigator.clipboard.writeText(text)
+        .then(() => alert("Score copied!"))
+        .catch(() => alert(text));
     }
   </script>
 </body>
